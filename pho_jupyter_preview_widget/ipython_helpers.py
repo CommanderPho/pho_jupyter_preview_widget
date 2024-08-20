@@ -2,6 +2,7 @@ from typing import Dict, List, Tuple, Optional, Callable, Union, Any
 from IPython.core.magic import Magics, magics_class, cell_magic, line_magic
 from IPython import get_ipython
 from IPython.display import display
+import ipykernel
 import numpy as np
 
 
@@ -111,5 +112,9 @@ class PreviewWidgetMagics(Magics):
         # Return the output to display it in the cell
         # return output
     
+
+
+
+
 
 
