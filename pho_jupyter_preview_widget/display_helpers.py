@@ -1,4 +1,6 @@
 from typing import Dict, List, Tuple, Optional, Callable, Union, Any, NewType, TypeVar
+import IPython
+import IPython.display
 from typing_extensions import TypeAlias
 from nptyping import NDArray
 
@@ -8,13 +10,10 @@ import dask.array as da
 
 import ipykernel # ip: "ipykernel.zmqshell.ZMQInteractiveShell)" = IPython.get_ipython()
 from IPython.display import display, HTML, Javascript
-from ipywidgets import widgets, VBox
-
-from IPython.display import Image, display, HTML
+from ipywidgets import widgets, VBox, HBox
 
 from io import BytesIO
 import base64
-import ipywidgets as widgets
 
 
 import matplotlib.pyplot as plt
@@ -145,6 +144,145 @@ def array_preview_with_graphical_shape_repr_html(arr):
 
 
 # Generate heatmap
+class MatplotlibToIPythonWidget:
+    """ 
+    
+    from pho_jupyter_preview_widget.display_helpers import MatplotlibToIPythonWidget
+    
+    MatplotlibToIPythonWidget.matplotlib_fig_to_ipython_HTML(fig=fig)
+    
+    """
+    @classmethod
+    def _matplotlib_fig_to_bytes(cls, fig) -> Optional[BytesIO]: # , omission_indices: list = None
+        """ 
+        
+        #TODO 2024-08-16 04:05: - [ ] Make non-interactive and open in the background
+
+        from neuropy.utils.matplotlib_helpers import matplotlib_configuration
+        with matplotlib_configuration(is_interactive=False, backend='AGG'):
+            # Perform non-interactive Matplotlib operations with 'AGG' backend
+            plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
+            plt.xlabel('X-axis')
+            plt.ylabel('Y-axis')
+            plt.title('Non-interactive Mode with AGG Backend')
+            plt.savefig('plot.png')  # Save the plot to a file (non-interactive mode)
+
+                
+        import matplotlib
+        import matplotlib as mpl
+        import matplotlib.pyplot as plt
+        _bak_rcParams = mpl.rcParams.copy()
+
+        matplotlib.use('Qt5Agg')
+        # %matplotlib inline
+        # %matplotlib auto
+
+
+        # _restore_previous_matplotlib_settings_callback = matplotlib_configuration_update(is_interactive=True, backend='Qt5Agg')
+        _restore_previous_matplotlib_settings_callback = matplotlib_configuration_update(is_interactive=True, backend='Qt5Agg')
+
+            
+        """
+        try:                
+            buf = BytesIO()            
+            fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
+            buf.seek(0)
+        except BaseException as err:
+            # SystemError: tile cannot extend outside image
+            print(f'ERROR: Encountered error while convert matplotlib fig: {fig} to bytes:\n\terr: {err}')
+            buf = None
+        # finally:
+        #     plt.close()        
+        
+        return buf
+
+
+    @classmethod
+    def matplotlib_fig_to_ipython_img(cls, fig, **img_kwargs) -> Optional[widgets.Image]:
+        img_kwargs = dict(width=None, height=img_kwargs.get('height', 100), format='png') | img_kwargs
+        buf = cls._matplotlib_fig_to_bytes(fig)
+        if buf is not None:
+            # Create an IPython Image object
+            img = widgets.Image(data=buf.getvalue(), **img_kwargs)
+            return img
+        else:
+            return None
+    
+
+    # Convert to ipywidgets Image
+    @classmethod
+    def matplotlib_fig_to_ipython_HTML(cls, fig, horizontal_layout=True, **kwargs) -> str:
+        """ Generate an HTML representation for a NumPy array with a Dask shape preview and a thumbnail heatmap
+        
+            from pho_jupyter_preview_widget.pho_jupyter_preview_widget.display_helpers import array_preview_with_heatmap_repr_html
+
+            # Register the custom display function for numpy arrays
+            import IPython
+            ip = IPython.get_ipython()
+            ip.display_formatter.formatters['text/html'].for_type(np.ndarray, array_preview_with_heatmap) # only registers for NDArray
+
+            # Example usage
+            arr = np.random.rand(3, 4)
+            display(arr)
+
+        """
+
+        # print(f'WARN: n_dim: {n_dim} greater than 2 is unsupported!')
+        # # from pyphocorehelpers.plotting.media_output_helpers import get_array_as_image_stack
+        # # #TODO 2024-08-13 05:05: - [ ] use get_array_as_image_stack to render the 3D array
+        # message = f"Heatmap Err: n_dim: {n_dim} greater than 2 is unsupported!"
+        # heatmap_html = f"""
+        # <div style="text-align: center; padding: 20px; border: 1px solid #ccc;">
+        #     <p style="font-size: 16px; color: red;">{message}</p>
+        # </div>
+        # """
+
+        out_image = cls.matplotlib_fig_to_ipython_img(fig, **kwargs)
+        if (out_image is not None):
+            orientation = "row" if horizontal_layout else "column"
+            ## Lays out side-by-side:
+            # Convert the IPython Image object to a base64-encoded string
+            out_image_data = out_image.data
+            b64_image = base64.b64encode(out_image_data).decode('utf-8')
+            # Create an HTML widget for the heatmap
+            fig_size_format_str: str = ''
+            width = kwargs.get('width', None)
+            if (width is not None) and (width > 0):
+                fig_size_format_str = fig_size_format_str + f'width="{width}" '
+            height = kwargs.get('height', None)
+            if (height is not None) and (height > 0):
+                fig_size_format_str = fig_size_format_str + f'height="{height}" '
+            
+            fig_image_html = f'<img src="data:image/png;base64,{b64_image}" {fig_size_format_str}style="background:transparent;"/>' #  width="{ndarray_preview_config.heatmap_thumbnail_width}"
+
+        else:
+            # getting image failed:
+            # Create an HTML widget for the heatmap
+            message = "Heatmap Err"
+            fig_image_html = f"""
+            <div style="text-align: center; padding: 20px; border: 1px solid #ccc;">
+                <p style="font-size: 16px; color: red;">{message}</p>
+            </div>
+            """
+
+            
+        # Combine both HTML representations
+        if horizontal_layout:
+            combined_html = f"""
+            <div style="display: flex; flex-direction: row; align-items: flex-start;">
+                <div>{fig_image_html}</div>
+            </div>
+            """
+        else:
+            combined_html = f"""
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div>{fig_image_html}</div>
+                <div style="margin-top: 10px;">
+                </div>
+            </div>
+            """
+        return combined_html
+
 
     
 def _subfn_create_heatmap(data: NDArray, brokenaxes_kwargs=None) -> Optional[BytesIO]: # , omission_indices: list = None
@@ -195,9 +333,7 @@ def _subfn_create_heatmap(data: NDArray, brokenaxes_kwargs=None) -> Optional[Byt
         ax.axis('off')
             
         buf = BytesIO()
-        
         fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
-
         buf.seek(0)
         
     except SystemError as err:
@@ -212,7 +348,7 @@ def _subfn_create_heatmap(data: NDArray, brokenaxes_kwargs=None) -> Optional[Byt
     return buf
 
 # Convert to ipywidgets Image
-def _subfn_display_heatmap(data: NDArray, brokenaxes_kwargs=None, **img_kwargs) -> Optional[Image]:
+def _subfn_display_heatmap(data: NDArray, brokenaxes_kwargs=None, **img_kwargs) -> Optional[IPython.core.display.Image]:
     """ Renders a small thumbnail Image of a heatmap array
     
     """
@@ -220,7 +356,7 @@ def _subfn_display_heatmap(data: NDArray, brokenaxes_kwargs=None, **img_kwargs) 
     buf = _subfn_create_heatmap(data, brokenaxes_kwargs=brokenaxes_kwargs)
     if buf is not None:
         # Create an IPython Image object
-        img = Image(data=buf.getvalue(), **img_kwargs)
+        img = IPython.core.display.Image(data=buf.getvalue(), **img_kwargs) # IPython.core.display.Image
         return img
     else:
         return None

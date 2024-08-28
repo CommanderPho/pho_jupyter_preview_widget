@@ -75,6 +75,8 @@ class PreviewWidgetMagics(Magics):
         %%ndarray_preview height=500, width=200, include_plaintext_repr=False
         
         %%ndarray_preview height=None, width=100, include_plaintext_repr=True, include_shape=False, horizontal_layout=False
+
+        %%ndarray_preview height=None, width=100, include_plaintext_repr=True, include_shape=False, horizontal_layout=False
         
         """
         from pho_jupyter_preview_widget.display_helpers import array_repr_with_graphical_preview
@@ -100,16 +102,33 @@ class PreviewWidgetMagics(Magics):
         # exec(cell, self.shell.user_ns) 
         # output = eval(cell, self.shell.user_ns) # The source may be a string representing one or more Python statements or a code object as returned by compile(). The globals must be a dictionary and locals can be any mapping, defaulting to the current globals and locals. If only globals is given, locals defaults to it.
 
-        # Execute the cell content and capture the output
-        exec(cell, self.shell.user_ns, self.shell.user_ns)  # Using user_ns for both globals and locals
-
-        # Fetch the variables created in the cell for display
-        output = self.shell.user_ns.get(cell.strip().split()[-1], None)
-
-        # Display the output using the custom formatter
-        if output is not None:
-            display(output)
+        # # Execute the cell content and capture the output
+        # exec(cell, self.shell.user_ns, self.shell.user_ns)  # Using user_ns for both globals and locals
+        # # Fetch the variables created in the cell for display
+        # output = self.shell.user_ns.get(cell.strip().split()[-1], None)
+        # # Display the output using the custom formatter
+        # if output is not None:
+        #     display(output)
         
+
+        # Split the cell into individual lines
+        cell_lines = cell.splitlines()
+        cell_outputs = []
+        
+        # Execute each line and capture output
+        for line in cell_lines:
+            exec(line, self.shell.user_ns, self.shell.user_ns)
+            
+            # If the last line was an expression, capture its value to display
+            if line.strip() and not line.strip().startswith('#'):
+                try:
+                    output = eval(line, self.shell.user_ns, self.shell.user_ns)
+                    if output is not None:
+                        display(output)
+                        cell_outputs.append(output)
+                        
+                except BaseException:
+                    pass  # Ignore errors for non-expressions or if exec-ed code raises an exception
 
         # Display the output using the custom formatter ______________________________________________________________________ #
 
