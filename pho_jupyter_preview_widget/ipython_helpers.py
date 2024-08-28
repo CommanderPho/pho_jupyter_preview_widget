@@ -57,6 +57,10 @@ class PreviewWidgetMagics(Magics):
         # call the line magic
         %config_ndarray_preview width=500 
         
+        
+        %config_ndarray_preview height=300, width=None, include_plaintext_repr=False, include_shape=False
+        
+        
         """
         from pho_jupyter_preview_widget.display_helpers import array_repr_with_graphical_preview
         config = _parse_ndarray_preview_params(line=line)
@@ -93,14 +97,25 @@ class PreviewWidgetMagics(Magics):
         array_repr_with_graphical_preview(ip=ip, **config)
         
         # Execute the cell content and capture the output
-        exec(cell, self.shell.user_ns)
-        output = eval(cell, self.shell.user_ns)
+        # exec(cell, self.shell.user_ns) 
+        # output = eval(cell, self.shell.user_ns) # The source may be a string representing one or more Python statements or a code object as returned by compile(). The globals must be a dictionary and locals can be any mapping, defaulting to the current globals and locals. If only globals is given, locals defaults to it.
+
+        # Execute the cell content and capture the output
+        exec(cell, self.shell.user_ns, self.shell.user_ns)  # Using user_ns for both globals and locals
+
+        # Fetch the variables created in the cell for display
+        output = self.shell.user_ns.get(cell.strip().split()[-1], None)
+
+        # Display the output using the custom formatter
+        if output is not None:
+            display(output)
+        
 
         # Display the output using the custom formatter ______________________________________________________________________ #
 
         # Fetch the variables created in the cell for display
         # output = {var_name: self.shell.user_ns[var_name] for var_name in self.shell.user_ns if isinstance(self.shell.user_ns[var_name], np.ndarray)}
-        display(output)
+        # display(output)
         
         # Remove the custom formatter
         ip.display_formatter.formatters['text/html'].type_printers.pop(np.ndarray, None)
