@@ -1,3 +1,4 @@
+# 2024-11-25 Errors
 ```python
 ---------------------------------------------------------------------------
 TypeError                                 Traceback (most recent call last)
@@ -77,3 +78,19 @@ File c:\Users\pho\repos\Spike3DWorkEnv\Spike3D\.venv\lib\site-packages\matplotli
 TypeError: Image data of dtype object cannot be converted to float
 
 ```
+
+<!-- =============================================================================================================== -->
+<!-- 2024-11-27 06:56 Issues with List[NDArray]                                                                      -->
+<!-- =============================================================================================================== -->
+```python
+# For example the variable `split_most_likely_positions_arrays`
+split_most_likely_positions_arrays = [np.array([119.191, 142.107, 180.3, 191.757, 245.227, 84.8181]), np.array([84.8181, 84.8181, 138.288]), np.array([134.469, 69.5411]), np.array([249.046]), np.array([249.046, 249.046])]
+# is rendered as "[, , , , ]" (incorrect)
+print(split_most_likely_positions_arrays) # [array([119.191, 142.107, 180.3, 191.757, 245.227, 84.8181]), array([84.8181, 84.8181, 138.288]), array([134.469, 69.5411]), array([249.046]), array([249.046, 249.046])]
+type(split_most_likely_positions_arrays) # list
+[type(v) for v in split_most_likely_positions_arrays] # [numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray]
+for v in split_most_likely_positions_arrays:
+	display(v)
+```
+
+

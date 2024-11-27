@@ -414,7 +414,22 @@ def _subfn_display_heatmap(data: NDArray, brokenaxes_kwargs=None, **img_kwargs) 
     else:
         return None
 
-def array_preview_with_heatmap_repr_html(arr, include_shape: bool=True, horizontal_layout=True, include_plaintext_repr:bool=False, **kwargs):
+
+# @function_attributes(short_name='array2str', tags=['array', 'formatting', 'fix'], input_requires=[], output_provides=[], uses=[], used_by=[], creation_date='2024-11-27 07:45')
+def smart_array2string(arr: NDArray, separator=',', **kwargs) -> str:
+    """ Drop-in replacement for `np.array2string` which consistently handles spaces. np.array2string automatically tries to format arrays in a way that is readable for matricies of data, but it uses the same formatting rules for 1D arrays, resulting in inconsistent numbers of spaces between elements. This function fixes that.
+    """
+    if np.ndim(arr) == 1:
+        ## np.array2string automatically tries to format arrays in a way that is readable for matricies of data, but it uses the same formatting rules for 1D arrays, resulting in inconsistent numbers of spaces between elements. This function fixes that.
+        return f'{separator} '.join([v.strip(' ') for v in np.array2string(arr, separator=separator, **kwargs).split(separator)]).replace('[ ', '[').replace(' ]', ']')
+    else:
+        return np.array2string(arr, separator=separator, **kwargs)
+    
+
+# ==================================================================================================================== #
+# Main formatting function                                                                                             #
+# ==================================================================================================================== #
+def single_NDArray_array_preview_with_heatmap_repr_html(arr, include_shape: bool=True, horizontal_layout=True, include_plaintext_repr:bool=False, **kwargs):
     """ Generate an HTML representation for a NumPy array with a Dask shape preview and a thumbnail heatmap
     
         from pho_jupyter_preview_widget.pho_jupyter_preview_widget.display_helpers import array_preview_with_heatmap_repr_html
@@ -493,8 +508,8 @@ def array_preview_with_heatmap_repr_html(arr, include_shape: bool=True, horizont
             """
 
         if include_plaintext_repr:                
-            # plaintext_repr = np.array2string(arr, edgeitems=3, threshold=5)  # Adjust these parameters as needed
-            plaintext_repr = np.array2string(arr)
+            # plaintext_repr = smart_array2string(arr, edgeitems=3, threshold=5)  # Adjust these parameters as needed
+            plaintext_repr = smart_array2string(arr)
             plaintext_html = f"<pre>{plaintext_repr}</pre>"
             plaintext_html = f"""
                 <div style="margin-left: 10px;">
@@ -504,6 +519,7 @@ def array_preview_with_heatmap_repr_html(arr, include_shape: bool=True, horizont
             
         # Combine both HTML representations
         if horizontal_layout:
+            ## vertical layout:
             combined_html = f"""
             <div style="display: flex; flex-direction: row; align-items: flex-start;">
                 <div>{heatmap_html}</div>
@@ -512,6 +528,7 @@ def array_preview_with_heatmap_repr_html(arr, include_shape: bool=True, horizont
             </div>
             """
         else:
+            ## vertical layout:
             combined_html = f"""
             <div style="display: flex; flex-direction: column; align-items: center;">
                 <div>{heatmap_html}</div>
@@ -526,6 +543,47 @@ def array_preview_with_heatmap_repr_html(arr, include_shape: bool=True, horizont
     else:
         raise ValueError("The input is not a NumPy array.")
 
+
+def array_preview_with_heatmap_repr_html(arr_or_list, include_shape: bool=True, horizontal_layout=True, include_plaintext_repr:bool=False, **kwargs):
+    """
+    Generates an HTML representation for a single numpy array or a list of numpy arrays.
+    """
+    # output_fn = HTML
+    output_fn = str
+    
+    def format_single_array(arr):
+        """ captures: include_shape, horizontal_layout, include_plaintext_repr, **kwargs """
+        # Use your existing logic for single numpy array heatmap representation
+        # Assuming this logic generates an HTML string for an array heatmap
+        return single_NDArray_array_preview_with_heatmap_repr_html(arr, include_shape=include_shape, horizontal_layout=horizontal_layout, include_plaintext_repr=include_plaintext_repr, **kwargs)
+    
+
+    if isinstance(arr_or_list, list):
+        if all(isinstance(v, np.ndarray) for v in arr_or_list):
+            # Handle list of numpy arrays
+            # formatted_arrays = [format_single_array(arr) for arr in arr_or_list] # not sure if we want to show the heatmap for each array, probably not.
+            # return output_fn("<ul>" + "".join(f"<li>{fa}</li>" for fa in formatted_arrays) + "</ul>") ## do I want to return the HTML or just the raw string?
+            formatted_arrays = [smart_array2string(arr) for arr in arr_or_list]
+            plaintext_repr: str = ', '.join(formatted_arrays)
+            plaintext_html = f"<pre>{plaintext_repr}</pre>"
+            plaintext_html = f"""
+                <div style="margin-left: 10px;">
+                    {plaintext_html}
+                </div>
+            """
+            return output_fn(plaintext_html)
+
+        else:
+            # If the list contains non-ndarray types, fallback to repr                
+            return output_fn(f"{repr(arr_or_list)}") # return default repr
+        
+            # return output_fn(f"<div>Unsupported list elements: {repr(arr_or_list)}</div>")
+    elif isinstance(arr_or_list, np.ndarray):
+        # Handle single numpy array
+        return output_fn(format_single_array(arr_or_list))
+    else:
+        # Fallback for unsupported types
+        return output_fn(f"<div>Unsupported type: {type(arr_or_list)}</div>")
 
 
 # ---------------------------------------------------------------------------- #
@@ -557,9 +615,28 @@ def array_repr_with_graphical_preview(ip: "ipykernel.zmqshell.ZMQInteractiveShel
     """
     from pho_jupyter_preview_widget.display_helpers import array_preview_with_heatmap_repr_html
 
+    # def format_single_array(arr):
+    #     # Your existing logic to render a single np.ndarray
+    #     return f"<div>{smart_array2string(arr, precision=3, separator=', ', suppress_small=True)}</div>"
+
+    # if isinstance(arr_or_list, list) and all(isinstance(v, np.ndarray) for v in arr_or_list):
+    #     # Handle list of np.ndarray
+    #     formatted_arrays = [format_single_array(arr) for arr in arr_or_list]
+    #     return HTML("<ul>" + "".join(f"<li>{fa}</li>" for fa in formatted_arrays) + "</ul>")
+    # elif isinstance(arr_or_list, np.ndarray):
+    #     # Handle single np.ndarray
+    #     return HTML(format_single_array(arr_or_list))
+    # else:
+    #     # Fallback for other types
+    #     return HTML(f"<div>Unsupported type: {type(arr_or_list)}</div>")
+
+
     # Register the custom display function for NumPy arrays
     ip.display_formatter.formatters['text/html'].for_type(np.ndarray, lambda arr: array_preview_with_heatmap_repr_html(arr, include_shape=include_shape, horizontal_layout=horizontal_layout, include_plaintext_repr=include_plaintext_repr, height=height, width=width))
     
+    ip.display_formatter.formatters['text/html'].for_type(list, lambda lst: array_preview_with_heatmap_repr_html(lst))
+
+
     # ## Plain-text type representation can be suppressed like:
     if include_plaintext_repr:
         # Override text formatter to prevent plaintext representation
@@ -579,7 +656,7 @@ def array_repr_with_graphical_preview(ip: "ipykernel.zmqshell.ZMQInteractiveShel
 
 # def format_list_of_ndarrays(obj, p, cycle):
 #     if all(isinstance(x, np.ndarray) for x in obj):
-#         return "[" + ", ".join(np.array2string(a) for a in obj) + "]"
+#         return "[" + ", ".join(smart_array2string(a) for a in obj) + "]"
 #     else:
 #         # Fallback to the original formatter
 #         return p.text(repr(obj))
@@ -590,7 +667,7 @@ def array_repr_with_graphical_preview(ip: "ipykernel.zmqshell.ZMQInteractiveShel
 
 # # ip.display_formatter.formatters['text/plain'].for_type(
 # #     List[NDArray], 
-# #     lambda arr, p, cycle: np.array2string(arr)
+# #     lambda arr, p, cycle: smart_array2string(arr)
 # # )
 
 # # Register the custom formatter
