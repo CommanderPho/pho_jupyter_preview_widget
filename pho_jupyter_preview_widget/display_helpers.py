@@ -416,10 +416,11 @@ def _subfn_display_heatmap(data: NDArray, brokenaxes_kwargs=None, **img_kwargs) 
 
 
 # @function_attributes(short_name='array2str', tags=['array', 'formatting', 'fix'], input_requires=[], output_provides=[], uses=[], used_by=[], creation_date='2024-11-27 07:45')
-def smart_array2string(arr: NDArray, separator=',', **kwargs) -> str:
+def smart_array2string(arr: NDArray, disable_readible_format: bool=False, separator=',', **kwargs) -> str:
     """ Drop-in replacement for `np.array2string` which consistently handles spaces. np.array2string automatically tries to format arrays in a way that is readable for matricies of data, but it uses the same formatting rules for 1D arrays, resulting in inconsistent numbers of spaces between elements. This function fixes that.
+    if disable_readible_format is False, nothing special is done.
     """
-    if np.ndim(arr) == 1:
+    if disable_readible_format and (np.ndim(arr) == 1):
         ## np.array2string automatically tries to format arrays in a way that is readable for matricies of data, but it uses the same formatting rules for 1D arrays, resulting in inconsistent numbers of spaces between elements. This function fixes that.
         return f'{separator} '.join([v.strip(' ') for v in np.array2string(arr, separator=separator, **kwargs).split(separator)]).replace('[ ', '[').replace(' ]', ']')
     else:
