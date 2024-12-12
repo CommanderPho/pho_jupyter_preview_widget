@@ -7,7 +7,8 @@ from nptyping import NDArray
 
 import numpy as np
 import pandas as pd
-import dask.array as da
+# import dask.array as da
+from pho_jupyter_preview_widget.array_shape_display import array_repr_html
 
 import ipykernel # ip: "ipykernel.zmqshell.ZMQInteractiveShell)" = IPython.get_ipython()
 from IPython.display import display, HTML, Javascript
@@ -186,7 +187,8 @@ def array_preview_with_graphical_shape_repr_html(arr):
 
     """
     if isinstance(arr, np.ndarray):
-        arr = da.array(arr)
+        # arr = da.array(arr)
+        arr = array_repr_html(arr)
         return display(arr)
         # shape_str = ' &times; '.join(map(str, arr.shape))
         # dtype_str = arr.dtype
@@ -500,7 +502,8 @@ def single_NDArray_array_preview_with_heatmap_repr_html(arr, include_shape: bool
         plaintext_html = ""
         
         if include_shape:
-            dask_array_widget: widgets.HTML = widgets.HTML(value=da.array(arr)._repr_html_())
+            # dask_array_widget: widgets.HTML = widgets.HTML(value=da.array(arr)._repr_html_())
+            dask_array_widget: widgets.HTML = widgets.HTML(value=array_repr_html(arr)) ## use new custom `array_repr_html` function            
             dask_array_widget_html: str = dask_array_widget.value
             dask_array_widget_html = f"""
                 <div style="margin-left: 10px;">
