@@ -4,7 +4,9 @@ from IPython import get_ipython
 from IPython.display import display
 import ipykernel
 import numpy as np
+import pandas as pd
 
+from pho_jupyter_preview_widget.display_helpers import render_scrollable_colored_table_from_dataframe
 
 def _parse_ndarray_preview_params(line: str) -> Dict:
     """ 
@@ -78,6 +80,8 @@ class PreviewWidgetMagics(Magics):
 
         %%ndarray_preview height=None, width=100, include_plaintext_repr=True, include_shape=False, horizontal_layout=False
         
+        compatable with `InteractiveShell.ast_node_interactivity = "all"` and handles multiple outputs gracefully.
+        
         """
         from pho_jupyter_preview_widget.display_helpers import array_repr_with_graphical_preview
             
@@ -97,25 +101,12 @@ class PreviewWidgetMagics(Magics):
             
         # Register the custom display function for NumPy arrays for the duration of the cell:
         array_repr_with_graphical_preview(ip=ip, **config)
-        
-        # Execute the cell content and capture the output
-        # exec(cell, self.shell.user_ns) 
-        # output = eval(cell, self.shell.user_ns) # The source may be a string representing one or more Python statements or a code object as returned by compile(). The globals must be a dictionary and locals can be any mapping, defaulting to the current globals and locals. If only globals is given, locals defaults to it.
-
-        # # Execute the cell content and capture the output
-        # exec(cell, self.shell.user_ns, self.shell.user_ns)  # Using user_ns for both globals and locals
-        # # Fetch the variables created in the cell for display
-        # output = self.shell.user_ns.get(cell.strip().split()[-1], None)
-        # # Display the output using the custom formatter
-        # if output is not None:
-        #     display(output)
-        
 
         # Split the cell into individual lines
         cell_lines = cell.splitlines()
         cell_outputs = []
         
-        # Execute each line and capture output
+        # Execute each line and capture output (for compatibility with `InteractiveShell.ast_node_interactivity = "all"` to handle multiple outputs gracefully)
         for line in cell_lines:
             exec(line, self.shell.user_ns, self.shell.user_ns)
             
@@ -129,12 +120,6 @@ class PreviewWidgetMagics(Magics):
                         
                 except BaseException:
                     pass  # Ignore errors for non-expressions or if exec-ed code raises an exception
-
-        # Display the output using the custom formatter ______________________________________________________________________ #
-
-        # Fetch the variables created in the cell for display
-        # output = {var_name: self.shell.user_ns[var_name] for var_name in self.shell.user_ns if isinstance(self.shell.user_ns[var_name], np.ndarray)}
-        # display(output)
         
         # Remove the custom formatter
         ip.display_formatter.formatters['text/html'].type_printers.pop(np.ndarray, None)
@@ -142,11 +127,19 @@ class PreviewWidgetMagics(Magics):
         ## Restore the previous formatter
         if _bak_formatter is not None:
             ip.display_formatter.formatters['text/html'].for_type(np.ndarray, _bak_formatter)
-            
-        # Return the output to display it in the cell
-        # return output
+        
     
 
+    @cell_magic
+    def scrollable_colored_table(self, line, cell):
+        # Execute the cell and capture the result
+        result = self.shell.run_cell(cell).result
+        if isinstance(result, pd.DataFrame):
+            # Apply custom formatter
+            display(render_scrollable_colored_table_from_dataframe(result))
+        else:
+            display(result)
+            
 
 
 

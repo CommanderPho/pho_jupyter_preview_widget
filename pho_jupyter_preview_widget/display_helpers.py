@@ -25,11 +25,12 @@ import matplotlib.pyplot as plt
 # 2024-05-30 - Custom Formatters                                                                                       #
 # ==================================================================================================================== #
 
+# @function_attributes(short_name=None, tags=['table', 'dataframe', 'formatter', 'display', 'render'], input_requires=[], output_provides=[], uses=[], used_by=[], creation_date='2025-01-01 13:39', related_items=[])
 def render_scrollable_colored_table_from_dataframe(df: pd.DataFrame, cmap_name: str = 'viridis', max_height: int = 400, width: str = '100%', is_dark_mode: bool=True, **kwargs) -> Union[HTML, str]:
     """ Takes a numpy array of values and returns a scrollable and color-coded table rendition of it
 
     Usage:    
-        from pho_jupyter_preview_widget.pho_jupyter_preview_widget.display_helpers import render_scrollable_colored_table_from_dataframe
+        from pyphocorehelpers.print_helpers import render_scrollable_colored_table_from_dataframe
 
         # Example usage:
 
@@ -39,10 +40,14 @@ def render_scrollable_colored_table_from_dataframe(df: pd.DataFrame, cmap_name: 
         render_scrollable_colored_table(array)
         
         # Example 2:
-			render_scrollable_colored_table(np.random.rand(100, 10), cmap_name='plasma', max_height=500, width='80%')
+            render_scrollable_colored_table(np.random.rand(100, 10), cmap_name='plasma', max_height=500, width='80%')
             render_scrollable_colored_table_from_dataframe(df=normalized_df, cmap_name=cmap_name, max_height=max_height, width=width, **kwargs)
             
     """
+    # white_color: str = 'white'
+    white_color: str = '#cacaca'
+    black_color: str = 'black'
+
     # Validate input array
     if not isinstance(df, pd.DataFrame):
         raise TypeError("Input must be a DataFrame array.")
@@ -64,7 +69,7 @@ def render_scrollable_colored_table_from_dataframe(df: pd.DataFrame, cmap_name: 
     def text_contrast(rgba):
         r, g, b, a = rgba[:4]
         luminance = 0.299 * r + 0.587 * g + 0.114 * b
-        return 'black' if luminance > 0.5 else 'white'
+        return black_color if luminance > 0.5 else white_color
 
     # Define a function to apply a colormap and text color based on luminance
     def color_map(val):
@@ -85,21 +90,36 @@ def render_scrollable_colored_table_from_dataframe(df: pd.DataFrame, cmap_name: 
         
         if use_default_formatting:
             if is_dark_mode:
-                color = 'black'
-                text_color = 'white'
+                color = black_color
+                text_color = white_color
             else:
-                color = 'white'
-                text_color = 'black'
+                color = white_color
+                text_color = black_color
 
         return f'background-color: rgba({color[0]*255}, {color[1]*255}, {color[2]*255}, {color[3]}); color: {text_color}'
 
     # Apply the color map with contrast adjustment
     styled_df = normalized_df.style.applymap(color_map)
     formatted_table = styled_df.set_table_attributes(f'style="display:block;overflow-x:auto;max-height:{max_height}px;width:{width};border-collapse:collapse;"').render()
+    
+    table_shape_footer = f"""
+        <div style="text-align: left; margin-top: 10px; font-size: 12px; color: {white_color if is_dark_mode else black_color};">
+            {df.shape[0]} rows × {df.shape[1]} columns
+        </div>
+    """
+
+    full_html = f"""
+        <div>
+            {formatted_table}
+            {table_shape_footer}
+        </div>
+    """
+
     # Render the DataFrame as a scrollable table with color-coded values
-    scrollable_table = HTML(formatted_table)
+    scrollable_table = HTML(full_html)
 
     return scrollable_table
+
 
 
 # @function_attributes(short_name=None, tags=['table', 'scrollable'], input_requires=[], output_provides=[], uses=[], used_by=[], creation_date='2024-10-25 19:12', related_items=[])
