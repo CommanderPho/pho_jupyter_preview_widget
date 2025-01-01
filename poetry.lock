@@ -2736,12 +2736,12 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pyphocorehelpers"
-version = "0.3.1"
+version = "0.3.2"
 description = "A collection of generally useful python code by Pho Hale"
 optional = false
 python-versions = ">=3.9,<3.12"
 files = []
-develop = false
+develop = true
 
 [package.dependencies]
 ansi2html = "^1.8.0"
@@ -2761,10 +2761,8 @@ objsize = "^0.6.1"
 pandas = "1.5.3"
 
 [package.source]
-type = "git"
-url = "https://github.com/CommanderPho/pyPhoCoreHelpers.git"
-reference = "HEAD"
-resolved_reference = "bd7e2a77bf993f36116e6f5ec500d220f23776fb"
+type = "directory"
+url = "../pyPhoCoreHelpers"
 
 [[package]]
 name = "python-dateutil"
@@ -3738,4 +3736,4 @@ notebook = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.12"
-content-hash = "c902b344d048b651cd1b6cfa5ee03e5829ce337c7f276f8e588584b17624169b"
+content-hash = "f7cae2471ebcecab0c0ea0736e0dbe58e558acf9ed49d9d57fb522a272241deb"

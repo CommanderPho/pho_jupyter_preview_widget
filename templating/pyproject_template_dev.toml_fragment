@@ -1,0 +1,2 @@
+[tool.poetry.group.remote.dependencies]
+pyphocorehelpers = { path = "../pyPhoCoreHelpers", develop=true}
