@@ -29,7 +29,7 @@ def render_scrollable_colored_table_from_dataframe(df: pd.DataFrame, cmap_name: 
     """ Takes a numpy array of values and returns a scrollable and color-coded table rendition of it
 
     Usage:    
-        from pho_jupyter_preview_widget.pho_jupyter_preview_widget.display_helpers import render_scrollable_colored_table
+        from pho_jupyter_preview_widget.pho_jupyter_preview_widget.display_helpers import render_scrollable_colored_table_from_dataframe
 
         # Example usage:
 
@@ -40,7 +40,8 @@ def render_scrollable_colored_table_from_dataframe(df: pd.DataFrame, cmap_name: 
         
         # Example 2:
 			render_scrollable_colored_table(np.random.rand(100, 10), cmap_name='plasma', max_height=500, width='80%')
-
+            render_scrollable_colored_table_from_dataframe(df=normalized_df, cmap_name=cmap_name, max_height=max_height, width=width, **kwargs)
+            
     """
     # Validate input array
     if not isinstance(df, pd.DataFrame):
