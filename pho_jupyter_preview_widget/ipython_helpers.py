@@ -6,7 +6,8 @@ import ipykernel
 import numpy as np
 import pandas as pd
 
-from pho_jupyter_preview_widget.display_helpers import render_scrollable_colored_table_from_dataframe
+# from pho_jupyter_preview_widget.display_helpers import render_scrollable_colored_table_from_dataframe
+from pyphocorehelpers.print_helpers import render_scrollable_colored_table_from_dataframe, render_scrollable_colored_table
 
 def _parse_ndarray_preview_params(line: str) -> Dict:
     """ 
