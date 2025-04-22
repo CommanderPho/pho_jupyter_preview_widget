@@ -28,8 +28,3 @@ wheel = "^0.45.1"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.extras]
-notebook = ["notebook"]
-
-[tool.poetry.scripts]
-
