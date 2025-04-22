@@ -30,7 +30,7 @@ from pyphocorehelpers.print_helpers import render_scrollable_colored_table_from_
     
 def array_preview_with_shape(arr):
     """ Text-only Represntation that prints np.shape(arr) 
-    
+        from pho_jupyter_preview_widget.pho_jupyter_preview_widget.display_helpers import array_preview_with_shape
         from pho_jupyter_preview_widget.display_helpers import array_preview_with_shape
 
         # Register the custom display function for numpy arrays
