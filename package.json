@@ -1,6 +1,6 @@
 {
   "name": "pho_jupyter_preview_widget",
-  "version": "1.0.5",
+  "version": "2.0.5",
   "description": "",
   "main": "webpack.config.js",
   "directories": {
@@ -11,7 +11,7 @@
     "build": "tsc && jupyter labextension install ."
   },
   "keywords": [],
-  "author": "",
+  "author": "Pho Hale",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.25.2",
