@@ -1,6 +1,6 @@
 [project]
 name = "pho-jupyter-preview-widget"
-version = "0.3.0"
+version = "0.3.1"
 description = "Provides Data Previews for many common data types, such as Numpy Arrays and Pandas Dataframes"
 authors = [{ name = "Pho Hale", email = "PhoHale@gmail.com" }]
 requires-python = ">=3.9,<3.12"

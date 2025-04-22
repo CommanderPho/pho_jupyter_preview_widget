@@ -11,7 +11,7 @@
     "build": "tsc && jupyter labextension install ."
   },
   "keywords": [],
-  "author": "",
+  "author": "Pho Hale",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.25.2",
