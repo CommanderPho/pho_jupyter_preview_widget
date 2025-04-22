@@ -24,7 +24,7 @@ dev = ["notebook>=7.2.1,<8"]
 default-groups = "all"
 
 [tool.uv.sources]
-pyphocorehelpers = { path = "../pyPhoCoreHelpers", editable = true }
+pyphocorehelpers = { git = "https://github.com/CommanderPho/pyPhoCoreHelpers.git" }
 
 [tool.hatch.build.targets.sdist]
 include = ["pho_jupyter_preview_widget/static/js/widget.bundle.js"]
