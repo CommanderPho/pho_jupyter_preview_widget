@@ -23,6 +23,8 @@ dev = ["notebook>=7.2.1,<8"]
 [tool.uv]
 default-groups = "all"
 
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.uv.sources]
 pyphocorehelpers = { path = "../pyPhoCoreHelpers", editable = true }
