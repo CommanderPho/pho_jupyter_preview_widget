@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pho-jupyter-preview-widget"
-version = "0.2.0"
+version = "1.0.6"
 description = "Provides Data Previews for many common data types, such as Numpy Arrays and Pandas Dataframes"
 authors = ["Pho Hale <PhoHale@gmail.com>"]
 readme = "README.md"
