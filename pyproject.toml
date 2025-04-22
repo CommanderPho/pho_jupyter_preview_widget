@@ -21,6 +21,7 @@ notebook = []
 dev = ["notebook>=7.2.1,<8"]
 
 [tool.uv]
+default-groups = "all"
 
 [tool.uv.sources]
 pyphocorehelpers = { path = "../pyPhoCoreHelpers", editable = true }
