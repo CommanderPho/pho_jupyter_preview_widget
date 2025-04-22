@@ -21,6 +21,8 @@ pyphocorehelpers = { path = "../pyPhoCoreHelpers", develop=true}
 
 [tool.poetry.group.dev.dependencies]
 notebook = "^7.2.1"
+setuptools = "^79.0.0"
+wheel = "^0.45.1"
 
 [build-system]
 requires = ["poetry-core"]
