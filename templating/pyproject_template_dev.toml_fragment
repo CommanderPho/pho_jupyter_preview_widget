@@ -1,2 +1,2 @@
-[tool.poetry.group.remote.dependencies]
-pyphocorehelpers = { path = "../pyPhoCoreHelpers", develop=true}
+[tool.uv.sources]
+pyphocorehelpers = { path = "../pyPhoCoreHelpers", editable = true }

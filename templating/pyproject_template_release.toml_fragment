@@ -1,2 +1,2 @@
-[tool.poetry.group.remote.dependencies]
-pyphocorehelpers = {git = "https://github.com/CommanderPho/pyPhoCoreHelpers.git"}
+[tool.uv.sources]
+pyphocorehelpers = { git = "https://github.com/CommanderPho/pyPhoCoreHelpers.git" }
