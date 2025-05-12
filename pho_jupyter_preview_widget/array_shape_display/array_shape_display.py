@@ -36,6 +36,11 @@ def maybe_pluralize(count, noun):
 
 def array_repr_html(shape, chunks, dtype, size=120):
     """Generate an HTML representation of an array's shape and chunks."""
+    # Handle case when chunks is None (standard NumPy arrays)
+    if chunks is None:
+        # For NumPy arrays, create a simple representation with just one chunk per dimension
+        chunks = [[dim] for dim in shape]
+
     svg = to_svg(chunks, size=size)
     nbytes = math.prod(shape) * dtype.itemsize if dtype and shape else "unknown"
     cbytes = math.prod(max(dim) for dim in chunks) * dtype.itemsize if dtype else "unknown"
@@ -54,7 +59,8 @@ def array_repr_html(shape, chunks, dtype, size=120):
     layers = maybe_pluralize(len(chunks), "graph layer")
 
     return template.render(
-        array={"shape": shape, "chunksize": max(dim) for dim in chunks},
+        # array={"shape": shape, "chunksize": max(dim) for dim in chunks},
+        array={"shape": shape, "chunksize": [max(dim) for dim in chunks]},
         grid=svg,
         nbytes=format_bytes(nbytes) if nbytes != "unknown" else "unknown",
         cbytes=format_bytes(cbytes) if cbytes != "unknown" else "unknown",
@@ -65,5 +71,6 @@ def array_repr_html(shape, chunks, dtype, size=120):
 """ 
 
 from pho_jupyter_preview_widget.array_shape_display import array_repr_html
+from pho_jupyter_preview_widget.array_shape_display.array_shape_display import array_repr_html
 
 """

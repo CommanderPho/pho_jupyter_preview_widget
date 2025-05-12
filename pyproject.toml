@@ -1,6 +1,6 @@
 [project]
 name = "pho-jupyter-preview-widget"
-version = "0.3.1"
+version = "0.4.0"
 description = "Provides Data Previews for many common data types, such as Numpy Arrays and Pandas Dataframes"
 authors = [{ name = "Pho Hale", email = "PhoHale@gmail.com" }]
 requires-python = ">=3.9,<3.12"
@@ -40,4 +40,9 @@ include = ["pho_jupyter_preview_widget/static/js/widget.bundle.js"]
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "dask>=2024.8.0",
+]
 

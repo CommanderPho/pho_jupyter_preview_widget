@@ -23,3 +23,11 @@ ip = array_repr_with_graphical_preview(ip=ip)
 # ip = dataframe_show_more_button(ip=ip)
 ```
 
+
+
+
+# Building
+```
+
+npx webpack
+```
