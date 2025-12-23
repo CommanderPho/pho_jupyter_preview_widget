@@ -28,6 +28,9 @@ ip = array_repr_with_graphical_preview(ip=ip)
 
 # Building
 ```
-
+npm install
 npx webpack
+npm run compile
+vsce package
+
 ```

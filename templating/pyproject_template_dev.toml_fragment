@@ -1,2 +1,2 @@
 [tool.uv.sources]
-pyphocorehelpers = { path = "../pyPhoCoreHelpers", editable = true }
+pyphocorehelpers = { path = "EXTERNAL/pyPhoCoreHelpers", editable = true }
